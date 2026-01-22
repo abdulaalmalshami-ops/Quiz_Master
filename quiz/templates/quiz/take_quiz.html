@@ -1,0 +1,181 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <div class="progress-container">
+        <div class="progress-bar" id="quiz-progress"></div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2>Taking: {{ quiz.title }}</h2>
+        <div id="timer-container" style="display: flex; align-items: center; gap: 10px;">
+            <div class="creative-icon sm icon-play"
+                style="width: 32px; height: 32px; border: none; background: rgba(56, 189, 248, 0.1); box-shadow: none;">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <span id="time-display" style="font-weight: 700; font-size: 1.1rem;">--:--</span>
+        </div>
+    </div>
+
+    <form method="post" id="quiz-form">
+        {% csrf_token %}
+        <div id="questions-container">
+            {% for question in questions %}
+            <div class="question-step" data-step="{{ forloop.counter0 }}">
+                <div class="question-block">
+                    <h3 style="margin-bottom: 20px; color: var(--primary);">Question {{ forloop.counter }} of {{
+                        questions.count }}</h3>
+                    <p style="font-size: 1.25rem; margin-bottom: 24px; color: var(--text-main);">{{ question.text }}</p>
+
+                    <div class="options" style="display: grid; gap: 12px;">
+                        {% for choice in question.choice_set.all %}
+                        <label class="card option-label"
+                            style="margin-bottom: 0; padding: 18px 24px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 15px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}"
+                                style="width: 20px; height: 20px; accent-color: var(--primary);">
+                            <span style="font-size: 1.05rem;">{{ choice.text }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No questions in this quiz yet.</p>
+            {% endfor %}
+        </div>
+
+        {% if questions %}
+        <div class="quiz-nav" style="display: flex; gap: 15px; align-items: center;">
+            <button type="button" id="prev-btn" class="btn btn-secondary"
+                style="display: none; align-items: center; gap: 10px; padding: 10px 20px;">
+                <div class="creative-icon sm"
+                    style="width: 24px; height: 24px; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15 19l-7-7 7-7" />
+                    </svg>
+                </div>
+                <span>Previous</span>
+            </button>
+            <div style="flex-grow: 1;"></div>
+            <button type="button" id="next-btn" class="btn"
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 20px;">
+                <span>Next Question</span>
+                <div class="creative-icon sm icon-play"
+                    style="width: 24px; height: 24px; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 5l7 7-7 7" />
+                    </svg>
+                </div>
+            </button>
+            <button type="submit" id="submit-btn" class="btn btn-primary"
+                style="display: none; align-items: center; gap: 10px; padding: 10px 24px;">
+                <div class="creative-icon sm icon-success"
+                    style="width: 24px; height: 24px; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                </div>
+                <span>Submit Quiz</span>
+            </button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    function initQuizTimer(timeLimitMinutes) {
+        let timeRemaining = timeLimitMinutes * 60;
+        const display = document.getElementById('time-display');
+        const form = document.getElementById('quiz-form');
+
+        function updateTimer() {
+            if (!display) return;
+
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+
+            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                // Optional: alert('Time is up!');
+                form.submit();
+            } else {
+                timeRemaining--;
+            }
+        }
+
+        updateTimer(); // Initial call
+        const timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const timeLimitMinutes = parseInt("{{ quiz.time_limit|default:10 }}");
+        initQuizTimer(timeLimitMinutes);
+
+        // Step-by-step logic
+        const steps = document.querySelectorAll('.question-step');
+        const progressBar = document.getElementById('quiz-progress');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const form = document.getElementById('quiz-form');
+        let currentStep = 0;
+        const totalSteps = steps.length;
+
+        function updateStep() {
+            steps.forEach(s => s.classList.remove('active'));
+            if (steps[currentStep]) {
+                steps[currentStep].classList.add('active');
+            }
+
+            // Progress Bar
+            const progress = ((currentStep + 1) / totalSteps) * 100;
+            if (progressBar) progressBar.style.width = `${progress}%`;
+
+            // Buttons visibility
+            if (prevBtn) prevBtn.style.display = currentStep === 0 ? 'none' : 'flex';
+
+            if (currentStep === totalSteps - 1) {
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (submitBtn) submitBtn.style.display = 'flex';
+            } else {
+                if (nextBtn) nextBtn.style.display = 'flex';
+                if (submitBtn) submitBtn.style.display = 'none';
+            }
+        }
+
+        if (totalSteps > 0) {
+            updateStep();
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    if (currentStep < totalSteps - 1) {
+                        currentStep++;
+                        updateStep();
+                    }
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentStep > 0) {
+                        currentStep--;
+                        updateStep();
+                    }
+                });
+            }
+
+            // Confirmation before submit
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    // No longer using browser confirm, as we have a custom confirmation page now
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}

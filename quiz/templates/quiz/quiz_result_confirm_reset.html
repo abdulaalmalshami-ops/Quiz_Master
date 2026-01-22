@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+    <h2 style="color: #ef4444; margin-bottom: 20px;">Confirm Result Reset</h2>
+    <p style="font-size: 1.1rem; margin-bottom: 30px;">
+        Are you sure you want to delete the result for user <strong>{{ result.user.username }}</strong> on quiz
+        <strong>{{ result.quiz.title }}</strong>?
+        <br><br>
+        <span style="color: var(--text-muted);">This action cannot be undone. The user will be able to retake the
+            quiz.</span>
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <a href="{% url 'quiz_results' %}" class="btn"
+                style="background: var(--surface); color: var(--text); border: 1px solid var(--border);">Cancel</a>
+            <button type="submit" class="btn" style="background: #ef4444; color: white; border: none;">Reset
+                Result</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

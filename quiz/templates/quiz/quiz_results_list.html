@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if user.is_superuser %}All User Results{% else %}My Results{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{% if user.is_superuser %}All User Results{% else %}My Quiz Results{% endif %}</h2>
+    <p style="color: #94a3b8; margin-top: 10px;">{% if user.is_superuser %}Review performance across all users and
+        quizzes.{% else %}Track your performance across different quizzes.{% endif %}</p>
+</div>
+
+<div class="results-list" style="margin-top: 30px;">
+    {% for result in results %}
+    <div class="card" style="margin-bottom: 20px; position: relative; overflow: hidden;">
+        <div
+            style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); opacity: 0.6;">
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-left: 10px;">
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div class="creative-icon icon-dashboard" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 5px; color: var(--primary);">{{ result.quiz.title }}</h3>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        {% if user.is_superuser %}
+                        <span
+                            style="color: var(--primary); font-size: 0.85rem; font-weight: 600; background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 4px;">
+                            User: {{ result.user.username }}
+                        </span>
+                        {% else %}
+                        <span style="font-weight: 500; color: var(--text-main);">You</span>
+                        {% endif %}
+
+                        <span
+                            style="color: var(--text-muted); font-size: 0.85rem; display: flex; align-items: center; gap: 5px;">
+                            <svg viewBox="0 0 24 24"
+                                style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2;">
+                                <path
+                                    d="M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM16 2v4M8 2v4M3 10h18" />
+                            </svg>
+                            {{ result.date_taken|date:"M d, Y H:i" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary);">
+                    {{ result.score }}/{{ result.total_questions }}
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {% widthratio result.score result.total_questions 100 as percentage %}
+                    {% if percentage|add:0 >= 50 %}
+                    <span style="color: #22c55e; font-weight: bold; font-size: 0.9rem;">ناجح</span>
+                    {% else %}
+                    <span style="color: #ef4444; font-weight: bold; font-size: 0.9rem;">راسب</span>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <a href="{% url 'quiz_result_detail' result.id %}" class="btn btn-secondary"
+                        style="padding: 4px 12px; font-size: 0.85rem;">View Answers</a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'reset_quiz_result' result.id %}" class="btn"
+                        style="background-color: #ef4444; color: white; padding: 4px 12px; font-size: 0.85rem; border-radius: 4px; text-decoration: none;">Reset</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card" style="text-align: center; padding: 60px;">
+        <p>No results yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Confirm Submission - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 40px auto; text-align: center; padding: 40px;">
+    <div class="creative-icon icon-success" style="margin: 0 auto 25px; width: 70px; height: 70px;">
+        <svg viewBox="0 0 24 24">
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        </svg>
+    </div>
+
+    <h2 style="margin-bottom: 15px; color: var(--primary);">Finish Quiz</h2>
+    <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem;">
+        Are you sure you want to submit "<strong>{{ quiz.title }}</strong>"?<br>
+        You won't be able to change your answers after submission.
+    </p>
+
+    <form method="post" action="{% url 'take_quiz' quiz.id %}"
+        style="display: flex; gap: 15px; justify-content: center;">
+        {% csrf_token %}
+        <input type="hidden" name="final_submit" value="true">
+
+        {# Pass through all the answers from the previous POST #}
+        {% for key, value in answers.items %}
+        {% if key != 'csrfmiddlewaretoken' %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endif %}
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary"
+            style="display: flex; gap: 10px; align-items: center; padding: 12px 24px;">
+            <div class="creative-icon sm icon-success"
+                style="width: 20px; height: 20px; border: none; background: none; box-shadow: none;">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6L9 17l-5-5" />
+                </svg>
+            </div>
+            <span>Confirm Submission</span>
+        </button>
+
+        <button type="button" onclick="window.history.back();" class="btn btn-secondary" style="padding: 12px 24px;">
+            Back to Review
+        </button>
+    </form>
+</div>
+{% endblock %}

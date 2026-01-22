@@ -1,0 +1,107 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Quiz Details - {{ result.quiz.title }}{% endblock %}
+
+{% block content %}
+<style>
+    .result-card {
+        margin-bottom: 20px;
+    }
+
+    .result-card.correct {
+        border-left: 5px solid #10b981;
+    }
+
+    .result-card.incorrect {
+        border-left: 5px solid #ef4444;
+    }
+
+    .answer-box {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .answer-box.correct {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid #10b981;
+    }
+
+    .answer-box.incorrect {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid #ef4444;
+    }
+
+    .correct-text {
+        color: #10b981;
+        font-weight: bold;
+    }
+
+    .incorrect-text {
+        color: #ef4444;
+        font-weight: bold;
+    }
+
+    .correct-answer-reference {
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px dashed #10b981;
+    }
+</style>
+
+<div class="card" style="margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin-bottom: 10px;">{{ result.quiz.title }} - Results</h2>
+            <p style="color: var(--text-muted);">Taken on {{ result.date_taken }}</p>
+        </div>
+        <div class="score-badge"
+            style="background: var(--primary); padding: 10px 20px; border-radius: 12px; font-weight: bold; font-size: 1.2rem;">
+            {{ result.score }} / {{ result.total_questions }}
+        </div>
+    </div>
+</div>
+
+<div class="questions-review">
+    {% for answer in user_answers %}
+    <div class="card result-card {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+        <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--text-main);">
+            Q{{ forloop.counter }}: {{ answer.question.text }}
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="answer-box {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+                <span style="font-weight: 600;">Your Answer:</span>
+                {% if answer.selected_choice %}
+                {{ answer.selected_choice.text }}
+                {% else %}
+                <span style="font-style: italic; color: var(--text-muted);">No answer selected</span>
+                {% endif %}
+
+                {% if answer.is_correct %}
+                <span style="float: right;" class="correct-text">Correct</span>
+                {% else %}
+                <span style="float: right;" class="incorrect-text">Incorrect</span>
+                {% endif %}
+            </div>
+
+            {% if not answer.is_correct %}
+            {% for choice in answer.question.choice_set.all %}
+            {% if choice.is_correct %}
+            <div class="correct-answer-reference">
+                <span style="font-weight: 600;" class="correct-text">Correct Answer:</span> {{ choice.text }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p>No details available for this result.</p>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 30px;">
+    <a href="{% url 'quiz_results' %}" class="btn btn-secondary">Back to My Results</a>
+</div>
+{% endblock %}

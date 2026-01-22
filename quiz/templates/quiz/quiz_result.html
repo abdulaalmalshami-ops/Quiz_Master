@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card result-card" style="text-align: center; padding: 50px 30px; max-width: 800px; margin: 0 auto;">
+    <h2
+        style="color: var(--text-muted); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.2em; margin-bottom: 10px;">
+        Quiz Completed</h2>
+    <h1 style="margin-bottom: 40px;">{{ quiz.title }}</h1>
+
+    <div class="score-display" style="margin-bottom: 50px;">
+        <h1 style="font-size: 6rem; line-height: 1;">{{ percentage|floatformat:0 }}%</h1>
+        <p style="color: var(--text-muted); font-size: 1.2rem;">Final Score</p>
+        <div style="margin-top: 15px;">
+            {% if percentage >= 50 %}
+            <span
+                style="background-color: #22c55e; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.2rem;">ناجح</span>
+            {% else %}
+            <span
+                style="background-color: #ef4444; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.2rem;">راسب</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px;">
+        <div class="stat-card" style="flex-direction: column; text-align: center; padding: 30px 20px;">
+            <div class="creative-icon icon-success" style="margin-bottom: 15px;">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6L9 17l-5-5" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value count-up" data-target="{{ score }}">0</span>
+                <span class="stat-label">Correct</span>
+            </div>
+        </div>
+
+        <div class="stat-card" style="flex-direction: column; text-align: center; padding: 30px 20px;">
+            <div class="creative-icon icon-delete" style="margin-bottom: 15px;">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value count-up" data-target="{{ incorrect }}">0</span>
+                <span class="stat-label">Incorrect</span>
+            </div>
+        </div>
+
+        <div class="stat-card" style="flex-direction: column; text-align: center; padding: 30px 20px;">
+            <div class="creative-icon icon-play" style="margin-bottom: 15px;">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value count-up" data-target="{{ total }}">0</span>
+                <span class="stat-label">Total Questions</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px; justify-content: center;">
+        {% if result_id %}
+        <a href="{% url 'quiz_result_detail' result_id %}" class="btn btn-secondary" style="padding: 14px 30px;">Review
+            Answers</a>
+        {% endif %}
+        <a href="{% url 'quiz_list' %}" class="btn" style="padding: 14px 30px;">View All Quizzes</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const counters = document.querySelectorAll('.count-up');
+        const speed = 100;
+
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const inc = Math.max(1, target / speed);
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 15);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<p style="color: var(--text-muted); margin-bottom: 30px;">Welcome back to Quiz Master!</p>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="creative-icon icon-play">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value count-up" data-target="{{ total_quizzes }}">0</span>
+            <span class="stat-label">Total Quizzes</span>
+        </div>
+        <a href="{% url 'quiz_list' %}" style="position: absolute; inset: 0;" title="View Quizzes"></a>
+    </div>
+
+    <div class="stat-card">
+        <div class="creative-icon icon-success">
+            <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value count-up" data-target="{{ total_questions }}">0</span>
+            <span class="stat-label">Total Questions</span>
+        </div>
+    </div>
+
+    <div class="stat-card" style="position: relative;">
+        <div class="creative-icon icon-edit">
+            <svg viewBox="0 0 24 24">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value count-up" data-target="{{ user_results_count }}">0</span>
+            <span class="stat-label">{% if user.is_superuser %}All User Results{% else %}Your Results{% endif %}</span>
+        </div>
+        <a href="{% url 'quiz_results' %}" style="position: absolute; inset: 0;" title="View Results"></a>
+    </div>
+
+    {% if not user.is_superuser %}
+    <div class="stat-card">
+        <div class="creative-icon icon-dashboard" style="background: rgba(251, 191, 36, 0.1); color: #fbbf24;">
+            <svg viewBox="0 0 24 24">
+                <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                </polygon>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value">{{ avg_score }}%</span>
+            <span class="stat-label">Average Score</span>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <div class="stat-card"
+        style="position: relative; border: 1px solid var(--primary); background: rgba(56, 189, 248, 0.05);">
+        <div class="creative-icon icon-dashboard">
+            <svg viewBox="0 0 24 24">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value" style="font-size: 1.5rem;">Take Quiz</span>
+            <span class="stat-label">Choose and Play</span>
+        </div>
+        <a href="{% url 'quiz_list' %}" style="position: absolute; inset: 0;" title="Take a Quiz"></a>
+    </div>
+</div>
+
+<h2 style="margin-top: 40px; margin-bottom: 20px;">Recent Activity</h2>
+{% if recent_activity %}
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Quiz</th>
+                <th>Score</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in recent_activity %}
+            <tr>
+                <td>{{ result.quiz.title }}</td>
+                <td>
+                    <span class="badge badge-primary">
+                        {{ result.score }}/{{ result.total_questions }}
+                    </span>
+                </td>
+                <td style="color: var(--text-muted);">{{ result.date_taken|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 40px; color: var(--text-muted);">
+    No recent activity. Why not take a quiz?
+</div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const counters = document.querySelectorAll('.count-up');
+        const speed = 200;
+
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const inc = target / speed;
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+    });
+</script>
+{% endblock %}

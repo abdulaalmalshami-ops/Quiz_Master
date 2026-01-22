@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 40px auto; text-align: center; padding: 40px;">
+    <div class="creative-icon icon-delete" style="margin: 0 auto 25px; width: 70px; height: 70px;">
+        <svg viewBox="0 0 24 24">
+            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+        </svg>
+    </div>
+    <h2 style="margin-bottom: 15px; color: var(--danger);">Delete Quiz</h2>
+    <p style="color: var(--text-muted); margin-bottom: 30px;">Are you sure you want to delete "<strong>{{ quiz.title
+            }}</strong>"?<br>This action cannot be undone.</p>
+
+    <form method="post" style="display: flex; gap: 15px; justify-content: center;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"
+            style="display: flex; gap: 10px; align-items: center; padding: 12px 24px;">
+            <div class="creative-icon sm icon-delete"
+                style="width: 20px; height: 20px; border: none; background: none; box-shadow: none;">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6L9 17l-5-5" />
+                </svg>
+            </div>
+            <span>Confirm Delete</span>
+        </button>
+        <a href="{% url 'quiz_list' %}" class="btn btn-secondary" style="padding: 12px 24px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

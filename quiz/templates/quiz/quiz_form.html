@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ action }} Quiz</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <div class="actions" style="margin-top: 30px; display: flex; gap: 15px; align-items: center;">
+            <button type="submit" name="save" class="btn"
+                style="display: flex; gap: 10px; align-items: center; padding: 12px 24px;">
+                <div class="creative-icon sm icon-success"
+                    style="width: 24px; height: 24px; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                </div>
+                <span>{% if action == 'Edit' %}Save Changes{% else %}Save Quiz{% endif %}</span>
+            </button>
+
+            {% if action == 'Create' %}
+            <button type="submit" name="save_another" class="btn btn-secondary"
+                style="display: flex; gap: 10px; align-items: center; padding: 12px 20px;">
+                <div class="creative-icon sm icon-plus"
+                    style="width: 24px; height: 24px; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <span>Save & Add Another</span>
+            </button>
+            {% endif %}
+
+            <a href="{% url 'quiz_list' %}" class="btn"
+                style="display: flex; gap: 10px; align-items: center; padding: 12px 20px; background: rgba(239, 68, 68, 0.05); color: var(--danger); border-color: rgba(239, 68, 68, 0.1);">
+                <div class="creative-icon sm icon-delete"
+                    style="width: 24px; height: 24px; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+                <span>Cancel</span>
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

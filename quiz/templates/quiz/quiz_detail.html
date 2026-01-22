@@ -1,0 +1,101 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ quiz.title }} - Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+            <h2>{{ quiz.title }}</h2>
+            <p style="color: #94a3b8; margin-top: 10px;">{{ quiz.description }}</p>
+        </div>
+        <div class="actions" style="display: flex; gap: 15px; align-items: center;">
+            <a href="{% url 'take_quiz' quiz.id %}" class="btn" style="display: flex; gap: 10px; padding: 10px 22px;">
+                <div class="creative-icon sm icon-play"
+                    style="border: none; background: rgba(255,255,255,0.02); box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5 3l14 9-14 9V3z" />
+                    </svg>
+                </div>
+                <span>Take Quiz</span>
+            </a>
+            {% if user.is_superuser %}
+            <a href="{% url 'quiz_edit' quiz.id %}" class="btn btn-secondary"
+                style="display: flex; gap: 10px; padding: 10px 22px;">
+                <div class="creative-icon sm icon-edit"
+                    style="border: none; background: rgba(255,255,255,0.02); box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                </div>
+                <span>Edit Info</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h3>Questions ({{ questions.count }})</h3>
+    {% if user.is_superuser %}
+    <a href="{% url 'add_question' quiz.id %}" class="btn" style="display: flex; gap: 10px; padding: 10px 22px;">
+        <div class="creative-icon sm icon-plus"
+            style="border: none; background: rgba(255,255,255,0.02); box-shadow: none;">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 4v16m8-8H4" />
+            </svg>
+        </div>
+        <span>Add Question</span>
+    </a>
+    {% endif %}
+</div>
+
+{% for question in questions %}
+<div class="card question-card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h4>{{ forloop.counter }}. {{ question.text }}</h4>
+        {% if user.is_superuser %}
+        <div class="question-actions" style="display: flex; gap: 10px;">
+            <a href="{% url 'question_edit' question.id %}" class="btn btn-secondary"
+                style="width: 35px; height: 35px; padding: 0;" title="Edit Question">
+                <div class="creative-icon sm icon-edit"
+                    style="width: 100%; height: 100%; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                </div>
+            </a>
+            <a href="{% url 'question_delete' question.id %}" class="btn btn-danger"
+                style="width: 35px; height: 35px; padding: 0;" title="Delete Question">
+                <div class="creative-icon sm icon-delete"
+                    style="width: 100%; height: 100%; border: none; background: none; box-shadow: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="choices-list" style="margin-top: 15px; margin-left: 20px;">
+        {% for choice in question.choice_set.all %}
+        <div class="choice-text {% if choice.is_correct %}choice-correct{% endif %}">
+            • {{ choice.text }} {% if choice.is_correct %}(Correct){% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div class="card" style="text-align: center; padding: 40px;">
+    <p style="color: #94a3b8; margin-bottom: 20px;">No questions added yet.</p>
+    {% if user.is_superuser %}
+    <a href="{% url 'add_question' quiz.id %}" class="btn">Add Your First Question</a>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% endblock %}

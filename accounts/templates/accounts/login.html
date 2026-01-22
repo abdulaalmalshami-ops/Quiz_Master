@@ -1,0 +1,39 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper"
+    style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 150px); padding: 40px 20px;">
+    <div class="card auth-card" style="max-width: 450px; width: 100%; text-align: center; padding: 40px;">
+        <div class="creative-icon icon-play" style="margin: 0 auto 25px; width: 70px; height: 70px;">
+            <svg viewBox="0 0 24 24">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+        </div>
+        <h2 style="margin-bottom: 10px;">Welcome Back</h2>
+        <p style="color: var(--text-muted); margin-bottom: 35px;">Login to continue your journey with Quiz Master</p>
+
+        <form method="post" style="text-align: left;">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter your username" required
+                    style="width: 100%;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter your password" required
+                    style="width: 100%;">
+            </div>
+
+            <button type="submit" class="btn"
+                style="width: 100%; padding: 14px; font-weight: 600; font-size: 1rem;">Login Now</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

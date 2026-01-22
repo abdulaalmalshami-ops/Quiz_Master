@@ -1,0 +1,72 @@
+{% extends "core/base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper"
+    style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 150px); padding: 40px 20px;">
+    <div class="card auth-card" style="max-width: 500px; width: 100%; text-align: center; padding: 40px;">
+        <div class="creative-icon icon-plus" style="margin: 0 auto 25px; width: 70px; height: 70px;">
+            <svg viewBox="0 0 24 24">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <line x1="20" y1="8" x2="20" y2="14" />
+                <line x1="17" y1="11" x2="23" y2="11" />
+            </svg>
+        </div>
+        <h2 style="margin-bottom: 10px;">Create Account</h2>
+        <p style="color: var(--text-muted); margin-bottom: 35px;">Join the Quiz Master community today</p>
+
+        <form method="post" style="text-align: left;">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn"
+                style="width: 100%; padding: 14px; font-weight: 600; font-size: 1rem; margin-top: 10px;">Register
+                Account</button>
+        </form>
+
+        <p style="margin-top: 25px; color: var(--text-muted);">
+            Already have an account? <a href="{% url 'login' %}"
+                style="color: var(--primary); text-decoration: none; font-weight: 600;">Login here</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Styling Django Form widgets to match our premium UI */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        width: 100% !important;
+        padding: 14px 18px !important;
+        background: rgba(15, 23, 42, 0.5) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 12px !important;
+        color: white !important;
+        font-size: 16px !important;
+        transition: var(--transition) !important;
+    }
+
+    input:focus {
+        outline: none !important;
+        border-color: var(--primary) !important;
+        background: rgba(15, 23, 42, 0.8) !important;
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1) !important;
+    }
+
+    ul.errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0;
+        color: var(--danger);
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
