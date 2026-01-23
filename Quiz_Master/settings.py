@@ -134,6 +134,11 @@ STATICFILES_DIRS = [
 ]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]
+
 
 
 if os.environ.get("RAILWAY_ENVIRONMENT") == "production":
